@@ -1,3 +1,4 @@
+import { Field } from '@nestjs/graphql';
 import {
   CreateDateColumn,
   PrimaryGeneratedColumn,
@@ -6,12 +7,14 @@ import {
 
 export class CoreEntity {
   @PrimaryGeneratedColumn()
+  @Field((type) => Number)
   id: number;
 
-  // 필드생성시 자동으로 시간을 등록해준다
   @CreateDateColumn()
+  @Field((type) => Date)
   createdAt: Date;
 
   @UpdateDateColumn()
+  @Field((type) => Date)
   updatedAt: Date;
 }
