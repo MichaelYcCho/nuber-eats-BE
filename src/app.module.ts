@@ -6,6 +6,7 @@ import { GraphQLModule } from '@nestjs/graphql'
 import { TypeOrmModule } from '@nestjs/typeorm'
 import { UsersModule } from './users/users.module'
 import { User } from './users/entities/user.entity'
+import { JwtModule } from './jwt/jwt.module'
 
 @Module({
     imports: [
@@ -38,7 +39,9 @@ import { User } from './users/entities/user.entity'
             driver: ApolloDriver,
             autoSchemaFile: true,
         }),
+        JwtModule.forRoot(),
         UsersModule,
+        JwtModule,
     ],
     controllers: [],
     providers: [],
