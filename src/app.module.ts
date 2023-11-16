@@ -49,12 +49,8 @@ import { JwtMiddleware } from './jwt/jwt.middleware'
     controllers: [],
     providers: [],
 })
-// JWTMiddlware를 /graphql 경로일때 Post인 경우만 적용한다는 의미
 export class AppModule implements NestModule {
     configure(consumer: MiddlewareConsumer) {
-        consumer.apply(JwtMiddleware).forRoutes({
-            path: '/graphql',
-            method: RequestMethod.POST,
-        })
+        consumer.apply(JwtMiddleware).forRoutes({ path: '/graphql', method: RequestMethod.ALL })
     }
 }
