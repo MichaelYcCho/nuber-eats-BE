@@ -1,12 +1,13 @@
 import { ApolloDriver } from '@nestjs/apollo'
 import { ConfigModule } from '@nestjs/config'
 import * as Joi from 'joi'
-import { Module } from '@nestjs/common'
+import { MiddlewareConsumer, Module, NestModule, RequestMethod } from '@nestjs/common'
 import { GraphQLModule } from '@nestjs/graphql'
 import { TypeOrmModule } from '@nestjs/typeorm'
 import { UsersModule } from './users/users.module'
 import { User } from './users/entities/user.entity'
 import { JwtModule } from './jwt/jwt.module'
+import { JwtMiddleware } from './jwt/jwt.middleware'
 
 @Module({
     imports: [
@@ -48,4 +49,12 @@ import { JwtModule } from './jwt/jwt.module'
     controllers: [],
     providers: [],
 })
-export class AppModule {}
+// JWTMiddlware를 /graphql 경로일때 Post인 경우만 적용한다는 의미
+export class AppModule implements NestModule {
+    configure(consumer: MiddlewareConsumer) {
+        consumer.apply(JwtMiddleware).forRoutes({
+            path: '/graphql',
+            method: RequestMethod.POST,
+        })
+    }
+}
