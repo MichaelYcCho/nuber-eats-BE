@@ -8,7 +8,7 @@ import { UsersModule } from './users/users.module'
 import { User } from './users/entities/user.entity'
 import { JwtModule } from './jwt/jwt.module'
 import { JwtMiddleware } from './jwt/jwt.middleware'
-import { AuthModule } from './auth/auth.module';
+import { AuthModule } from './auth/auth.module'
 
 @Module({
     imports: [
@@ -47,7 +47,6 @@ import { AuthModule } from './auth/auth.module';
         }),
         UsersModule,
         JwtModule,
-        AuthModule,
     ],
     controllers: [],
     providers: [],
