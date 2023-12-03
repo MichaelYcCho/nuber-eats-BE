@@ -55,8 +55,6 @@ import { MailModule } from './mail/mail.module'
             fromEmail: process.env.MAILGUN_FROM_EMAIL,
         }),
         UsersModule,
-        JwtModule,
-        MailModule,
     ],
     controllers: [],
     providers: [],
