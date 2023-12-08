@@ -119,6 +119,14 @@ describe('UserService', () => {
             expect(mailService.sendVerificationEmail).toHaveBeenCalledWith(expect.any(String), expect.any(String))
             expect(result).toEqual({ ok: true })
         })
+
+        // 어떤 exception이 발생했다면, fail 처리 되어야 한다.
+        it('should fail on exception', async () => {
+            // findOne에 대한 mockResolvedValue를 설정한다(Error)
+            usersRepository.findOne.mockRejectedValue(new Error())
+            const result = await service.createAccount(createAccountArgs)
+            expect(result).toEqual({ ok: false, error: "Couldn't create account" })
+        })
     })
 
     // 테스트할 함수명을 작성
