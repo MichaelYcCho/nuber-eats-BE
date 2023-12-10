@@ -130,8 +130,25 @@ describe('UserService', () => {
     })
 
     // 테스트할 함수명을 작성
-    it.todo('createAccount')
-    it.todo('login')
+
+    describe('login', () => {
+        const loginArgs = {
+            email: 'bs@email.com',
+            password: 'bs.password',
+        }
+        it('should fail if user does not exist', async () => {
+            usersRepository.findOne.mockResolvedValue(null)
+
+            const result = await service.login(loginArgs)
+
+            expect(usersRepository.findOne).toHaveBeenCalledTimes(1)
+            expect(usersRepository.findOne).toHaveBeenCalledWith(expect.any(Object), expect.any(Object))
+            expect(result).toEqual({
+                ok: false,
+                error: 'User not found',
+            })
+        })
+    })
     it.todo('findById')
     it.todo('editProfile')
     it.todo('verifyEmail')
