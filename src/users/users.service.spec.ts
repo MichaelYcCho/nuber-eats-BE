@@ -29,8 +29,12 @@ describe('UserService', () => {
     let usersRepository: MockRepository<User>
     let verificationsRepository: MockRepository<Verification>
     let mailService: MailService
+    let jwtService: JwtService
 
-    beforeAll(async () => {
+    // beforeAll은 테스트 한 것이 Jest메모리에 남아있어, toHaveBeenCalledTimes 등에 영향을 줄 수 있다.
+    // each를 사용하면, 각각의 테스트가 끝날 때마다, 모든 것을 초기화한다.
+    //beforeAll(async () => {
+    beforeEach(async () => {
         // 모듈을 만들고, 테스트할 서비스를 가져온다.
         const module = await Test.createTestingModule({
             providers: [
@@ -55,6 +59,7 @@ describe('UserService', () => {
         }).compile()
         service = module.get<UserService>(UserService)
         mailService = module.get<MailService>(MailService)
+        jwtService = module.get<JwtService>(JwtService)
         usersRepository = module.get(getRepositoryToken(User))
         verificationsRepository = module.get(getRepositoryToken(Verification))
     })
@@ -147,6 +152,29 @@ describe('UserService', () => {
                 ok: false,
                 error: 'User not found',
             })
+        })
+
+        it('should fail if the password is wrong', async () => {
+            const mockedUser = {
+                // Promise.resolve를 사용하면, 비동기 함수를 사용할 수 있다.
+                checkPassword: jest.fn(() => Promise.resolve(false)),
+            }
+            usersRepository.findOne.mockResolvedValue(mockedUser)
+            const result = await service.login(loginArgs)
+            expect(result).toEqual({ ok: false, error: 'Wrong password' })
+        })
+
+        it('should return token if password correct', async () => {
+            const mockedUser = {
+                id: 1,
+                checkPassword: jest.fn(() => Promise.resolve(true)),
+            }
+            usersRepository.findOne.mockResolvedValue(mockedUser)
+            const result = await service.login(loginArgs)
+            console.log(result)
+            expect(jwtService.sign).toHaveBeenCalledTimes(1)
+            expect(jwtService.sign).toHaveBeenCalledWith(expect.any(Number))
+            expect(result).toEqual({ ok: true, token: 'signed-token-baby' })
         })
     })
     it.todo('findById')
