@@ -16,7 +16,7 @@ const mockRepository = () => ({
 })
 
 const mockJwtService = () => ({
-    sign: jest.fn(),
+    sign: jest.fn(() => 'signed-token-baby'),
     verify: jest.fn(),
 })
 
@@ -82,11 +82,7 @@ describe('UserService', () => {
                 id: 1,
                 email: '',
             })
-            const result = await service.createAccount({
-                email: '',
-                password: '',
-                role: 0,
-            })
+            const result = await service.createAccount(createAccountArgs)
             expect(result).toMatchObject({
                 ok: false,
                 error: 'There is a user with that email already',
@@ -149,7 +145,10 @@ describe('UserService', () => {
             const result = await service.login(loginArgs)
 
             expect(usersRepository.findOne).toHaveBeenCalledTimes(1)
-            expect(usersRepository.findOne).toHaveBeenCalledWith(expect.any(Object), expect.any(Object))
+            expect(usersRepository.findOne).toHaveBeenCalledWith({
+                select: ['id', 'password'],
+                where: { email: loginArgs.email },
+            })
             expect(result).toEqual({
                 ok: false,
                 error: 'User not found',
@@ -227,7 +226,7 @@ describe('UserService', () => {
             await service.editProfile(editProfileArgs.userId, editProfileArgs.input)
 
             expect(usersRepository.findOne).toHaveBeenCalledTimes(1)
-            expect(usersRepository.findOne).toHaveBeenCalledWith(editProfileArgs.userId)
+            expect(usersRepository.findOne).toHaveBeenCalledWith({ where: { id: editProfileArgs.userId } })
 
             expect(verificationsRepository.create).toHaveBeenCalledWith({
                 user: newUser,
@@ -269,7 +268,11 @@ describe('UserService', () => {
             const result = await service.verifyEmail('')
 
             expect(verificationsRepository.findOne).toHaveBeenCalledTimes(1)
-            expect(verificationsRepository.findOne).toHaveBeenCalledWith(expect.any(Object), expect.any(Object))
+            //expect(verificationsRepository.findOne).toHaveBeenCalledWith(expect.any(Object), expect.any(Object))
+            expect(verificationsRepository.findOne).toHaveBeenCalledWith({
+                relations: ['user'],
+                where: { code: '' },
+            })
             expect(usersRepository.save).toHaveBeenCalledTimes(1)
             expect(usersRepository.save).toHaveBeenCalledWith({ verified: true })
 
