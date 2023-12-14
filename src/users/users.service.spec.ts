@@ -15,6 +15,7 @@ const mockRepository = () => ({
     delete: jest.fn(),
 })
 
+// Class 보다 function으로 만들면, 테스트를 실행할 때마다, 새로 호출하는 효과가 있다.
 const mockJwtService = () => ({
     sign: jest.fn(() => 'signed-token-baby'),
     verify: jest.fn(),
