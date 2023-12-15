@@ -3,14 +3,16 @@ import * as jwt from 'jsonwebtoken'
 import { CONFIG_OPTIONS } from 'src/common/common.constants'
 import { JwtService } from 'src/jwt/jwt.service'
 
+const TEST_KEY = 'testKey'
+const USER_ID = 1
+
 // 외부 라이브러리에 대한 mocking
 jest.mock('jsonwebtoken', () => {
     return {
         sign: jest.fn(() => 'TOKEN'),
+        verify: jest.fn(() => ({ id: USER_ID })),
     }
 })
-
-const TEST_KEY = 'testKey'
 
 describe('JwtService', () => {
     let service: JwtService
@@ -31,15 +33,21 @@ describe('JwtService', () => {
     })
     describe('sign', () => {
         it('should return a signed token', () => {
+            const token = service.sign(USER_ID)
             const ID = 1
-            const token = service.sign(ID)
             expect(typeof token).toBe('string') // token이 string인지 확인
             expect(jwt.sign).toHaveBeenCalledTimes(1)
-            expect(jwt.sign).toHaveBeenLastCalledWith({ id: ID }, TEST_KEY)
+            expect(jwt.sign).toHaveBeenLastCalledWith({ id: USER_ID }, TEST_KEY)
         })
     })
     describe('verify', () => {
-        it('should return the decoded token', () => {})
+        it('should return the decoded token', () => {
+            const TOKEN = 'TOKEN'
+            const decodedToken = service.verify(TOKEN)
+            expect(decodedToken).toEqual({ id: USER_ID })
+            expect(jwt.verify).toHaveBeenCalledTimes(1)
+            expect(jwt.verify).toHaveBeenCalledWith(TOKEN, TEST_KEY)
+        })
     })
     it.todo('verify')
 })
