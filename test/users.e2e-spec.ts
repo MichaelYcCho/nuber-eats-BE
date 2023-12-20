@@ -86,6 +86,7 @@ describe('UserModule (e2e)', () => {
                 .expect((res) => {
                     expect(res.body.data.createAccount.ok).toBe(false)
                     expect(res.body.data.createAccount.error).toBe('There is a user with that email already')
+                    // 또는 toEqual(expect.any(String))
                 })
         })
     })
