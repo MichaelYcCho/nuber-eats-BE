@@ -9,8 +9,8 @@ import { UserProfileInput, UserProfileOutput } from './dtos/user-profile.dto'
 
 import { User } from './entities/user.entity'
 import { UserService } from './users.service'
-import { EditProfileInput, EditProfileOutput } from './src/users/dtos/edit-profile.dto'
-import { VerifyEmailInput, VerifyEmailOutput } from './src/users/dtos/verify-email.dto'
+import { EditProfileInput, EditProfileOutput } from './dtos/edit-profile.dto'
+import { VerifyEmailInput, VerifyEmailOutput } from './dtos/verify-email.dto'
 
 @Resolver((of) => User)
 export class UserResolver {

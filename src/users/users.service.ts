@@ -9,9 +9,10 @@ import { JwtService } from 'src/jwt/jwt.service'
 import { Verification } from './entities/verification.entity'
 
 import { UserProfileOutput } from './dtos/user-profile.dto'
-import { EditProfileInput, EditProfileOutput } from './src/users/dtos/edit-profile.dto'
-import { VerifyEmailOutput } from './src/users/dtos/verify-email.dto'
+
 import { MailService } from 'src/mail/mail.service'
+import { EditProfileInput, EditProfileOutput } from './dtos/edit-profile.dto'
+import { VerifyEmailOutput } from './dtos/verify-email.dto'
 
 @Injectable()
 export class UserService {

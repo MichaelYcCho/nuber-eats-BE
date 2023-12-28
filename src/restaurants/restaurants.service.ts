@@ -1,28 +1,43 @@
-import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import { Restaurant } from './entities/restaurant.entity';
-import { CreateRestaurantDto } from './dtos/create-restaurant.dto';
-import { UpdateRestaurantDto } from './dtos/update-restaurant.dto';
+import { Injectable } from '@nestjs/common'
+import { InjectRepository } from '@nestjs/typeorm'
+import { User } from 'src/users/entities/user.entity'
+import { Repository } from 'typeorm'
+import { CreateRestaurantInput, CreateRestaurantOutput } from './dtos/create-restaurant.dto'
+
+import { Restaurant } from './entities/restaurant.entity'
+import { Category } from './entities/category.entity'
 
 @Injectable()
 export class RestaurantService {
-  constructor(
-    @InjectRepository(Restaurant)
-    private readonly restaurants: Repository<Restaurant>,
-  ) {}
-  getAll(): Promise<Restaurant[]> {
-    return this.restaurants.find();
-  }
-  createRestaurant(
-    createRestaurantDto: CreateRestaurantDto,
-  ): Promise<Restaurant> {
-    // create 는 js에서 생성하는 부분, save는 db에 저장하는 부분
-    const newRestaurant = this.restaurants.create(createRestaurantDto);
-    return this.restaurants.save(newRestaurant);
-  }
-  updateRestaurant({ id, data }: UpdateRestaurantDto) {
-    // update의 첫번째 인자는 업데이트할 매개인자(criteria : 기준), 두번째 인자는 업데이트할 데이터,
-    return this.restaurants.update(id, { ...data });
-  }
+    constructor(
+        @InjectRepository(Restaurant)
+        private readonly restaurants: Repository<Restaurant>,
+        @InjectRepository(Category)
+        private readonly categories: Repository<Category>,
+    ) {}
+
+    async createRestaurant(owner: User, createRestaurantInput: CreateRestaurantInput): Promise<CreateRestaurantOutput> {
+        try {
+            const newRestaurant = this.restaurants.create(createRestaurantInput)
+            newRestaurant.owner = owner
+            const categoryName = createRestaurantInput.categoryName.trim().toLowerCase()
+            const categorySlug = categoryName.replace(/ /g, '-')
+            let category = await this.categories.findOne({ where: { slug: categorySlug } })
+            if (!category) {
+                category = await this.categories.save(
+                    this.categories.create({ slug: categorySlug, name: categoryName }),
+                )
+            }
+            newRestaurant.category = category
+            await this.restaurants.save(newRestaurant)
+            return {
+                ok: true,
+            }
+        } catch {
+            return {
+                ok: false,
+                error: 'Could not create restaurant',
+            }
+        }
+    }
 }
