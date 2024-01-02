@@ -9,6 +9,7 @@ export class AuthGuard implements CanActivate {
     constructor(private readonly reflector: Reflector) {}
     canActivate(context: ExecutionContext) {
         const roles = this.reflector.get<AllowedRoles>('roles', context.getHandler())
+        // roles가 없으면 public이라는 뜻이므로 true를 리턴한다.
         if (!roles) {
             return true
         }
