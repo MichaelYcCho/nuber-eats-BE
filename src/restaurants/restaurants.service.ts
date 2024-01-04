@@ -6,6 +6,7 @@ import { CreateRestaurantInput, CreateRestaurantOutput } from './dtos/create-res
 
 import { Restaurant } from './entities/restaurant.entity'
 import { Category } from './entities/category.entity'
+import { EditRestaurantInput, EditRestaurantOutput } from './dtos/edit-restaurant.dto'
 
 @Injectable()
 export class RestaurantService {
@@ -40,4 +41,6 @@ export class RestaurantService {
             }
         }
     }
+
+    async editRestaurant(owner: User, editRestaurantInput: EditRestaurantInput) {}
 }
