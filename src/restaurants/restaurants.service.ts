@@ -7,17 +7,18 @@ import { CreateRestaurantInput, CreateRestaurantOutput } from './dtos/create-res
 import { Restaurant } from './entities/restaurant.entity'
 import { Category } from './entities/category.entity'
 import { EditRestaurantInput, EditRestaurantOutput } from './dtos/edit-restaurant.dto'
+import { CategoryRepository } from './repositories/category.repository'
 
 @Injectable()
 export class RestaurantService {
     constructor(
         @InjectRepository(Restaurant)
         private readonly restaurants: Repository<Restaurant>,
-        @InjectRepository(Category)
-        private readonly categories: Repository<Category>,
+        @InjectRepository(CategoryRepository)
+        private readonly categories: CategoryRepository,
     ) {}
 
-    async getOrCreateCategory(name: string): Promise<Category> {
+    async getOrCreate(name: string): Promise<Category> {
         const categoryName = name.trim().toLowerCase()
         const categorySlug = categoryName.replace(/ /g, '-')
         let category = await this.categories.findOne({ where: { slug: categorySlug } })
@@ -31,7 +32,7 @@ export class RestaurantService {
         try {
             const newRestaurant = this.restaurants.create(createRestaurantInput)
             newRestaurant.owner = owner
-            const category = await this.getOrCreateCategory(createRestaurantInput.categoryName)
+            const category = await this.categories.getOrCreate(createRestaurantInput.categoryName)
             newRestaurant.category = category
             await this.restaurants.save(newRestaurant)
             return {
@@ -60,6 +61,18 @@ export class RestaurantService {
                     error: "You can't edit a restaurant that you don't own",
                 }
             }
+            let category: Category = null
+            if (editRestaurantInput.categoryName) {
+                category = await this.categories.getOrCreate(editRestaurantInput.categoryName)
+            }
+            // ...(category && { category })는 category가 존재하면 { category: category }를 리턴하고, 존재하지 않으면 아무것도 리턴하지 않는다.
+            await this.restaurants.save([
+                {
+                    id: editRestaurantInput.restaurantId,
+                    ...editRestaurantInput,
+                    ...(category && { category }),
+                },
+            ])
 
             return {
                 ok: true,
