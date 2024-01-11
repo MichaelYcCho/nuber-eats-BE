@@ -1,4 +1,4 @@
-import { Args, Int, Mutation, Query, ResolveField, Resolver } from '@nestjs/graphql'
+import { Args, Int, Mutation, Parent, Query, ResolveField, Resolver } from '@nestjs/graphql'
 import { AuthUser } from 'src/auth/auth-user.decorator'
 import { Role } from 'src/auth/role.decorator'
 import { User, UserRole } from 'src/users/entities/user.entity'
@@ -48,8 +48,8 @@ export class CategoryResolver {
 
     //매 request마다 계산된 field값을 가져온다. (DB에는 존재하지 않고 GraphQL 스키마에만 존재)
     @ResolveField((type) => Int)
-    restaurantCount(): number {
-        return 80
+    restaurantCount(@Parent() category: Category): Promise<number> {
+        return this.restaurantService.countRestaurants(category)
     }
 
     @Query((type) => AllCategoriesOutput)
