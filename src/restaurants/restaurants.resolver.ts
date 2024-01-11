@@ -1,4 +1,4 @@
-import { Args, Mutation, Resolver } from '@nestjs/graphql'
+import { Args, Int, Mutation, Query, ResolveField, Resolver } from '@nestjs/graphql'
 import { AuthUser } from 'src/auth/auth-user.decorator'
 import { Role } from 'src/auth/role.decorator'
 import { User, UserRole } from 'src/users/entities/user.entity'
@@ -7,6 +7,8 @@ import { Restaurant } from './entities/restaurant.entity'
 import { RestaurantService } from './restaurants.service'
 import { EditRestaurantInput, EditRestaurantOutput } from './dtos/edit-restaurant.dto'
 import { DeleteRestaurantInput, DeleteRestaurantOutput } from './dtos/delete-restaurant.dto'
+import { AllCategoriesOutput } from './dtos/all-categories.dto'
+import { Category } from './entities/category.entity'
 
 @Resolver((of) => Restaurant)
 export class RestaurantResolver {
@@ -37,5 +39,21 @@ export class RestaurantResolver {
         @Args('input') deleteRestaurantInput: DeleteRestaurantInput,
     ): Promise<DeleteRestaurantOutput> {
         return this.restaurantService.deleteRestaurant(owner, deleteRestaurantInput)
+    }
+}
+
+@Resolver((of) => Category)
+export class CategoryResolver {
+    constructor(private readonly restaurantService: RestaurantService) {}
+
+    //매 request마다 계산된 field값을 가져온다. (DB에는 존재하지 않고 GraphQL 스키마에만 존재)
+    @ResolveField((type) => Int)
+    restaurantCount(): number {
+        return 80
+    }
+
+    @Query((type) => AllCategoriesOutput)
+    allCategories(): Promise<AllCategoriesOutput> {
+        return this.restaurantService.allCategories()
     }
 }
