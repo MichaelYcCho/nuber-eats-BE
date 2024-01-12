@@ -10,7 +10,7 @@ import { EditRestaurantInput, EditRestaurantOutput } from './dtos/edit-restauran
 import { CategoryRepository } from './repositories/category.repository'
 import { DeleteRestaurantInput, DeleteRestaurantOutput } from './dtos/delete-restaurant.dto'
 import { AllCategoriesOutput } from './dtos/all-categories.dto'
-import { CategoryInput } from './dtos/category.dto'
+import { CategoryInput, CategoryOutput } from './dtos/category.dto'
 
 @Injectable()
 export class RestaurantService {
@@ -130,12 +130,22 @@ export class RestaurantService {
         })
     }
 
-    async findCategoryBySlug({ slug }: CategoryInput): Promise<CategoryOutput> {
+    async findCategoryBySlug({ slug, page }: CategoryInput): Promise<CategoryOutput> {
         try {
             const category = await this.categories.findOne({
                 where: { slug },
-                relations: ['restaurants'],
             })
+            const restaurants = await this.restaurants.find({
+                where: {
+                    category: {
+                        id: category.id,
+                    },
+                },
+                take: 25,
+                skip: (page - 1) * 25,
+            })
+            category.restaurants = restaurants
+            const totalResults = await this.countRestaurants(category)
             if (!category) {
                 return {
                     ok: false,
@@ -145,6 +155,7 @@ export class RestaurantService {
             return {
                 ok: true,
                 category,
+                totalPages: Math.ceil(totalResults / 25),
             }
         } catch {
             return {
