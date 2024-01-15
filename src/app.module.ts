@@ -14,6 +14,7 @@ import { Restaurant } from './restaurants/entities/restaurant.entity'
 import { Category } from './restaurants/entities/category.entity'
 import { RestaurantsModule } from './restaurants/restaurants.module'
 import { AuthModule } from './auth/auth.module'
+import { join } from 'path'
 
 @Module({
     imports: [
@@ -42,12 +43,12 @@ import { AuthModule } from './auth/auth.module'
             password: process.env.DB_PASSWORD,
             database: process.env.DB_NAME,
             synchronize: process.env.NODE_ENV !== 'prod',
-            logging: process.env.NODE_ENV !== 'prod' && process.env.NODE_ENV !== 'test',
+            //logging: process.env.NODE_ENV !== 'prod' && process.env.NODE_ENV !== 'test',
             entities: [User, Verification, Restaurant, Category],
         }),
         GraphQLModule.forRoot({
             driver: ApolloDriver,
-            autoSchemaFile: true,
+            autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
             context: ({ req }) => ({ user: req['user'] }),
         }),
         JwtModule.forRoot({
