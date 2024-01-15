@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { User } from 'src/users/entities/user.entity'
-import { Repository } from 'typeorm'
+import { Like, Repository } from 'typeorm'
 import { CreateRestaurantInput, CreateRestaurantOutput } from './dtos/create-restaurant.dto'
 
 import { Restaurant } from './entities/restaurant.entity'
@@ -12,13 +12,14 @@ import { DeleteRestaurantInput, DeleteRestaurantOutput } from './dtos/delete-res
 import { AllCategoriesOutput } from './dtos/all-categories.dto'
 import { CategoryInput, CategoryOutput } from './dtos/category.dto'
 import { RestaurantsInput, RestaurantsOutput } from './dtos/restaurants.dto'
+import { SearchRestaurantInput, SearchRestaurantOutput } from './dtos/search-restaurant.dto'
+import { RestaurantInput, RestaurantOutput } from './dtos/restaurant.dto'
 
 @Injectable()
 export class RestaurantService {
     constructor(
         @InjectRepository(Restaurant)
         private readonly restaurants: Repository<Restaurant>,
-        @InjectRepository(CategoryRepository)
         private readonly categories: CategoryRepository,
     ) {}
 
@@ -28,11 +29,12 @@ export class RestaurantService {
             newRestaurant.owner = owner
             const category = await this.categories.getOrCreate(createRestaurantInput.categoryName)
             newRestaurant.category = category
+
             await this.restaurants.save(newRestaurant)
             return {
                 ok: true,
             }
-        } catch {
+        } catch (error) {
             return {
                 ok: false,
                 error: 'Could not create restaurant',
