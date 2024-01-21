@@ -15,6 +15,7 @@ import { Category } from './restaurants/entities/category.entity'
 import { RestaurantsModule } from './restaurants/restaurants.module'
 import { AuthModule } from './auth/auth.module'
 import { join } from 'path'
+import { Dish } from './restaurants/entities/dish.entity'
 
 @Module({
     imports: [
@@ -44,7 +45,7 @@ import { join } from 'path'
             database: process.env.DB_NAME,
             synchronize: process.env.NODE_ENV !== 'prod',
             //logging: process.env.NODE_ENV !== 'prod' && process.env.NODE_ENV !== 'test',
-            entities: [User, Verification, Restaurant, Category],
+            entities: [User, Verification, Restaurant, Category, Dish],
         }),
         GraphQLModule.forRoot({
             driver: ApolloDriver,
