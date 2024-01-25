@@ -18,9 +18,14 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
+type DishChoice {
+  name: String!
+  extra: Int
+}
+
 type DishOption {
   name: String!
-  choices: [String!]
+  choices: [DishChoice!]
   extra: Int
 }
 
@@ -141,6 +146,16 @@ type CreateDishOutput {
   ok: Boolean!
 }
 
+type EditDishOutput {
+  error: String
+  ok: Boolean!
+}
+
+type DeleteDishOutput {
+  error: String
+  ok: Boolean!
+}
+
 type Query {
   me: User!
   userProfile(userId: Float!): UserProfileOutput!
@@ -173,6 +188,8 @@ type Mutation {
   editRestaurant(input: EditRestaurantInput!): EditRestaurantOutput!
   deleteRestaurant(input: DeleteRestaurantInput!): DeleteRestaurantOutput!
   createDish(input: CreateDishInput!): CreateDishOutput!
+  editDish(input: EditDishInput!): EditDishOutput!
+  deleteDish(input: DeleteDishInput!): DeleteDishOutput!
 }
 
 input CreateAccountInput {
@@ -224,6 +241,23 @@ input CreateDishInput {
 
 input DishOptionInputType {
   name: String!
-  choices: [String!]
+  choices: [DishChoiceInputType!]
   extra: Int
+}
+
+input DishChoiceInputType {
+  name: String!
+  extra: Int
+}
+
+input EditDishInput {
+  name: String
+  price: Int
+  description: String
+  options: [DishOptionInputType!]
+  dishId: Int!
+}
+
+input DeleteDishInput {
+  dishId: Int!
 }
