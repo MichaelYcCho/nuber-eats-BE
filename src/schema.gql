@@ -41,6 +41,25 @@ type Dish {
   options: [DishOption!]
 }
 
+type Order {
+  id: Float!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  customer: User
+  driver: User
+  restaurant: Restaurant!
+  dishes: [Dish!]!
+  total: Float!
+  status: OrderStatus!
+}
+
+enum OrderStatus {
+  Pending
+  Cooking
+  PickedUp
+  Delivered
+}
+
 type Restaurant {
   id: Float!
   createdAt: DateTime!
@@ -50,6 +69,7 @@ type Restaurant {
   address: String!
   category: Category
   owner: User!
+  orders: [Order!]!
   menu: [Dish!]!
 }
 
@@ -62,6 +82,8 @@ type User {
   role: UserRole!
   verified: Boolean!
   restaurants: [Restaurant!]!
+  orders: [Order!]!
+  rides: [Order!]!
 }
 
 enum UserRole {
