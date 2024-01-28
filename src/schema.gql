@@ -41,6 +41,14 @@ type Dish {
   options: [DishOption!]
 }
 
+type OrderItem {
+  id: Float!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  dish: Dish!
+  options: [DishOption!]
+}
+
 type Order {
   id: Float!
   createdAt: DateTime!
@@ -48,7 +56,7 @@ type Order {
   customer: User
   driver: User
   restaurant: Restaurant!
-  dishes: [Dish!]!
+  items: [OrderItem!]!
   total: Float
   status: OrderStatus!
 }
@@ -291,8 +299,13 @@ input DeleteDishInput {
 }
 
 input CreateOrderInput {
-  dishes: [DishInputType!]!
+  items: [OrderItemInputType!]!
   restaurantId: Int!
+}
+
+input OrderItemInputType {
+  dish: DishInputType!
+  options: [DishOptionInputType!]
 }
 
 input DishInputType {
@@ -335,7 +348,7 @@ input OrderInputType {
   customer: UserInputType
   driver: UserInputType
   restaurant: RestaurantInputType!
-  dishes: [DishInputType!]!
+  items: [OrderItemInputType!]!
   total: Float
   status: OrderStatus!
 }
