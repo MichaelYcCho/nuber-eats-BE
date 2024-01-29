@@ -41,12 +41,18 @@ type Dish {
   options: [DishOption!]
 }
 
+type OrderItemOption {
+  name: String!
+  choice: String
+  extra: Int
+}
+
 type OrderItem {
   id: Float!
   createdAt: DateTime!
   updatedAt: DateTime!
   dish: Dish!
-  options: [DishOption!]
+  options: [OrderItemOption!]
 }
 
 type Order {
@@ -55,7 +61,7 @@ type Order {
   updatedAt: DateTime!
   customer: User
   driver: User
-  restaurant: Restaurant!
+  restaurant: Restaurant
   items: [OrderItem!]!
   total: Float
   status: OrderStatus!
@@ -299,56 +305,17 @@ input DeleteDishInput {
 }
 
 input CreateOrderInput {
-  items: [OrderItemInputType!]!
   restaurantId: Int!
+  items: [CreateOrderItemInput!]!
 }
 
-input OrderItemInputType {
-  dish: DishInputType!
-  options: [DishOptionInputType!]
+input CreateOrderItemInput {
+  dishId: Int!
+  options: [OrderItemOptionInputType!]
 }
 
-input DishInputType {
+input OrderItemOptionInputType {
   name: String!
-  price: Int!
-  photo: String
-  description: String!
-  restaurant: RestaurantInputType!
-  options: [DishOptionInputType!]
-}
-
-input RestaurantInputType {
-  name: String!
-  coverImg: String!
-  address: String!
-  category: CategoryInputType
-  owner: UserInputType!
-  orders: [OrderInputType!]!
-  menu: [DishInputType!]!
-}
-
-input CategoryInputType {
-  name: String!
-  coverImg: String
-  slug: String!
-  restaurants: [RestaurantInputType!]
-}
-
-input UserInputType {
-  email: String!
-  password: String!
-  role: UserRole!
-  verified: Boolean!
-  restaurants: [RestaurantInputType!]!
-  orders: [OrderInputType!]!
-  rides: [OrderInputType!]!
-}
-
-input OrderInputType {
-  customer: UserInputType
-  driver: UserInputType
-  restaurant: RestaurantInputType!
-  items: [OrderItemInputType!]!
-  total: Float
-  status: OrderStatus!
+  choice: String
+  extra: Int
 }
