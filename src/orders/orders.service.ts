@@ -4,9 +4,10 @@ import { Repository } from 'typeorm'
 import { Order } from './entities/order.entity'
 import { Restaurant } from 'src/restaurants/entities/restaurant.entity'
 import { CreateOrderInput, CreateOrderOutput } from './dtos/create-order.dto'
-import { User } from 'src/users/entities/user.entity'
+import { User, UserRole } from 'src/users/entities/user.entity'
 import { OrderItem } from './entities/order-item.entity'
 import { Dish } from 'src/restaurants/entities/dish.entity'
+import { GetOrdersInput, GetOrdersOutput } from './dtos/get-orders.dto'
 
 @Injectable()
 export class OrderService {
@@ -82,6 +83,48 @@ export class OrderService {
             return {
                 ok: false,
                 error: 'Could not create order.',
+            }
+        }
+    }
+
+    async getOrders(user: User, { status }: GetOrdersInput): Promise<GetOrdersOutput> {
+        try {
+            let orders: Order[]
+            if (user.role === UserRole.Client) {
+                orders = await this.orders.find({
+                    where: {
+                        customerId: user.id,
+                        ...(status && { status }),
+                    },
+                })
+            } else if (user.role === UserRole.Delivery) {
+                orders = await this.orders.find({
+                    where: {
+                        driverId: user.id,
+                        ...(status && { status }),
+                    },
+                })
+            } else if (user.role === UserRole.Owner) {
+                const restaurants = await this.restaurants.find({
+                    where: {
+                        ownerId: user.id,
+                        ...(status && { status }),
+                    },
+                    relations: ['orders'],
+                })
+                orders = restaurants.map((restaurant) => restaurant.orders).flat(1)
+                if (status) {
+                    orders = orders.filter((order) => order.status === status)
+                }
+            }
+            return {
+                ok: true,
+                orders,
+            }
+        } catch {
+            return {
+                ok: false,
+                error: 'Could not get orders',
             }
         }
     }
