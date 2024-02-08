@@ -43,7 +43,7 @@ type Dish {
 
 type OrderItemOption {
   name: String!
-  choices: String
+  choice: String
   extra: Int
 }
 
@@ -197,6 +197,18 @@ type CreateOrderOutput {
   ok: Boolean!
 }
 
+type GetOrdersOutput {
+  error: String
+  ok: Boolean!
+  orders: [Order!]
+}
+
+type GetOrderOutput {
+  error: String
+  ok: Boolean!
+  order: Order
+}
+
 type Query {
   me: User!
   userProfile(userId: Float!): UserProfileOutput!
@@ -204,6 +216,8 @@ type Query {
   searchRestaurant(input: SearchRestaurantInput!): SearchRestaurantOutput!
   allCategories: AllCategoriesOutput!
   category(input: CategoryInput!): CategoryOutput!
+  getOrders(input: GetOrdersInput!): GetOrdersOutput!
+  getOrder(input: GetOrderInput!): GetOrderOutput!
 }
 
 input RestaurantInput {
@@ -218,6 +232,14 @@ input SearchRestaurantInput {
 input CategoryInput {
   page: Int! = 1
   slug: String!
+}
+
+input GetOrdersInput {
+  status: OrderStatus
+}
+
+input GetOrderInput {
+  id: Float!
 }
 
 type Mutation {
@@ -316,6 +338,6 @@ input CreateOrderItemInput {
 
 input OrderItemOptionInputType {
   name: String!
-  choices: String
+  choice: String
   extra: Int
 }
