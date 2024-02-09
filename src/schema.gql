@@ -70,6 +70,7 @@ type Order {
 enum OrderStatus {
   Pending
   Cooking
+  Cooked
   PickedUp
   Delivered
 }
