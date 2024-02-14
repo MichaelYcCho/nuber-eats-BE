@@ -46,7 +46,9 @@ export class OrderResolver {
     }
 
     @Subscription((returns) => String)
-    subscriptionsExample() {
+    @Role(['Any'])
+    subscriptionsExample(@AuthUser() user: User) {
+        console.log(user)
         return pubsub.asyncIterator('ExampleSubscription')
     }
 }
