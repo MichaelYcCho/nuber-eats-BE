@@ -41,17 +41,21 @@ export class OrderResolver {
     }
 
     @Mutation((returns) => Boolean)
-    connectionReady() {
-        this.pubSub.publish('ExampleSubscription', {
-            subscriptionsExample: 'Your connection is ready.',
+    async connectionReady(@Args('connectId') connectId: number) {
+        await this.pubSub.publish('ExampleSubscription', {
+            subscriptionsExample: connectId,
         })
         return true
     }
 
-    @Subscription((returns) => String)
+    @Subscription((returns) => String, {
+        filter: ({ subscriptionsExample }, { connectId }) => {
+            return subscriptionsExample === connectId
+        },
+    })
     @Role(['Any'])
-    subscriptionsExample(@AuthUser() user: User) {
-        console.log(user)
+    subscriptionsExample(@Args('connectId') connectId: number) {
+        console.log('connectId', connectId)
         return this.pubSub.asyncIterator('ExampleSubscription')
     }
 }
