@@ -52,6 +52,8 @@ export class OrderResolver {
         filter: ({ subscriptionsExample }, { connectId }) => {
             return subscriptionsExample === connectId
         },
+        resolve: ({ subscriptionsExample }) => {
+            return `Your connectId is ${subscriptionsExample}`
     })
     @Role(['Any'])
     subscriptionsExample(@Args('connectId') connectId: number) {
