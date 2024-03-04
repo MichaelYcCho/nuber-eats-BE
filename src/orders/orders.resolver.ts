@@ -11,6 +11,7 @@ import { GetOrderInput, GetOrderOutput } from './dtos/get-order.dto'
 import { PubSub } from 'graphql-subscriptions'
 import { Inject } from '@nestjs/common'
 import { PUB_SUB } from 'src/common/common.constants'
+import { EditOrderInput, EditOrderOutput } from './dtos/edit-order.dto'
 
 @Resolver((of) => Order)
 export class OrderResolver {
@@ -38,6 +39,15 @@ export class OrderResolver {
     @Role(['Any'])
     async getOrder(@AuthUser() user: User, @Args('input') getOrderInput: GetOrderInput): Promise<GetOrderOutput> {
         return this.ordersService.getOrder(user, getOrderInput)
+    }
+
+    @Mutation(returns => EditOrderOutput)
+    @Role(['Any'])
+    async editOrder(
+        @AuthUser() user: User,
+        @Args('input') editOrderInput: EditOrderInput,
+    ): Promise<EditOrderOutput> {
+        return this.ordersService.editOrder(user, editOrderInput);
     }
 
     @Mutation((returns) => Boolean)
