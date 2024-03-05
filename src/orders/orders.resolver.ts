@@ -10,7 +10,7 @@ import { GetOrdersInput, GetOrdersOutput } from './dtos/get-orders.dto'
 import { GetOrderInput, GetOrderOutput } from './dtos/get-order.dto'
 import { PubSub } from 'graphql-subscriptions'
 import { Inject } from '@nestjs/common'
-import { PUB_SUB } from 'src/common/common.constants'
+import { NEW_PENDING_ORDER, PUB_SUB } from 'src/common/common.constants'
 import { EditOrderInput, EditOrderOutput } from './dtos/edit-order.dto'
 
 @Resolver((of) => Order)
@@ -41,13 +41,10 @@ export class OrderResolver {
         return this.ordersService.getOrder(user, getOrderInput)
     }
 
-    @Mutation(returns => EditOrderOutput)
+    @Mutation((returns) => EditOrderOutput)
     @Role(['Any'])
-    async editOrder(
-        @AuthUser() user: User,
-        @Args('input') editOrderInput: EditOrderInput,
-    ): Promise<EditOrderOutput> {
-        return this.ordersService.editOrder(user, editOrderInput);
+    async editOrder(@AuthUser() user: User, @Args('input') editOrderInput: EditOrderInput): Promise<EditOrderOutput> {
+        return this.ordersService.editOrder(user, editOrderInput)
     }
 
     @Mutation((returns) => Boolean)
@@ -58,16 +55,14 @@ export class OrderResolver {
         return true
     }
 
-    @Subscription((returns) => String, {
-        filter: ({ subscriptionsExample }, { connectId }) => {
-            return subscriptionsExample === connectId
+    @Subscription((returns) => Order, {
+        filter: (payload, _, context) => {
+            console.log(payload, context)
+            return true
         },
-        resolve: ({ subscriptionsExample }) => {
-            return `Your connectId is ${subscriptionsExample}`
     })
-    @Role(['Any'])
-    subscriptionsExample(@Args('connectId') connectId: number) {
-        console.log('connectId', connectId)
-        return this.pubSub.asyncIterator('ExampleSubscription')
+    @Role(['Owner'])
+    pendingOrders() {
+        return this.pubSub.asyncIterator(NEW_PENDING_ORDER)
     }
 }
