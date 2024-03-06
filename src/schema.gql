@@ -210,6 +210,11 @@ type GetOrderOutput {
   order: Order
 }
 
+type EditOrderOutput {
+  error: String
+  ok: Boolean!
+}
+
 type Query {
   me: User!
   userProfile(userId: Float!): UserProfileOutput!
@@ -255,7 +260,8 @@ type Mutation {
   editDish(input: EditDishInput!): EditDishOutput!
   deleteDish(input: DeleteDishInput!): DeleteDishOutput!
   createOrder(input: CreateOrderInput!): CreateOrderOutput!
-  connectionReady: Boolean!
+  editOrder(input: EditOrderInput!): EditOrderOutput!
+  connectionReady(connectId: Float!): Boolean!
 }
 
 input CreateAccountInput {
@@ -344,6 +350,11 @@ input OrderItemOptionInputType {
   extra: Int
 }
 
+input EditOrderInput {
+  id: Float!
+  status: OrderStatus!
+}
+
 type Subscription {
-  subscriptionsExample: String!
+  pendingOrders: Order!
 }
